@@ -12,7 +12,6 @@ class PlatformsChart extends ChartWidget
 
     protected function getData(): array
     {
-        // Query the platforms with their game count
         $platforms = Platform::withCount('games')->get();
 
         return [
@@ -31,6 +30,6 @@ class PlatformsChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar'; // Can be 'line', 'pie', etc.
+        return 'bar';
     }
 }
