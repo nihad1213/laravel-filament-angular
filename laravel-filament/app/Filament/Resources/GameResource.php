@@ -32,6 +32,8 @@ class GameResource extends Resource
                     ->cols(20)
                     ->required(),
                 Forms\Components\FileUpload::make('cover_image')
+                    ->disk('public')
+                    ->directory('images')
                     ->required()
                     ->image(),
                 Forms\Components\DatePicker::make('release_date')
@@ -55,18 +57,29 @@ class GameResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+               Tables\Columns\TextColumn::make('name')
+                   ->sortable()
+                   ->searchable(),
+
+               Tables\Columns\TextColumn::make('description')
+                   ->limit(100)
+                   ->wrap()
+                   ->tooltip(fn ($record) => $record->description),
+
+               Tables\Columns\ImageColumn::make('cover_image')
+                   ->square()
+                   ->disk('public')
+                   ->height(50),
+
+               Tables\Columns\TextColumn::make('release_date')
+                   ->date()
+                   ->sortable(),
+
+               Tables\Columns\TextColumn::make('categories.name')
+                   ->label('Categories'),
+
+               Tables\Columns\TextColumn::make('platforms.name')
+                   ->label('Platforms'),
             ]);
     }
 
