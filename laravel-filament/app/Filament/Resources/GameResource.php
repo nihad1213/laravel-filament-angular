@@ -140,6 +140,10 @@ class GameResource extends Resource
                 Filter::make('no_cover_image')
                     ->query(fn (Builder $query): Builder => $query->whereNull('cover_image'))
                     ->label('Missing Cover Image'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
 
