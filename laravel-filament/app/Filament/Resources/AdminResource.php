@@ -95,7 +95,6 @@ class AdminResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Filter by Email Verification Status
                 SelectFilter::make('email_verified')
                     ->options([
                         'verified' => 'Verified',
@@ -114,7 +113,6 @@ class AdminResource extends Resource
                     })
                     ->label('Email Status'),
 
-                // Filter by Registration Date
                 SelectFilter::make('registration_period')
                     ->options([
                         'today' => 'Today',
@@ -144,22 +142,18 @@ class AdminResource extends Resource
                     })
                     ->label('Registration Period'),
 
-                // Filter by Recent Activity (Updated Recently)
                 Filter::make('recently_updated')
                     ->query(fn (Builder $query): Builder => $query->where('updated_at', '>=', Carbon::now()->subDays(7)))
                     ->label('Updated in Last 7 Days'),
 
-                // Filter by New Admins (Last 30 days)
                 Filter::make('new_admins')
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', Carbon::now()->subDays(30)))
                     ->label('New Admins (Last 30 Days)'),
 
-                // Filter by Admins with Remember Token (Currently logged in somewhere)
                 Filter::make('has_remember_token')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('remember_token'))
                     ->label('Has Active Sessions'),
 
-                // Filter by Admin Name Length (for data quality)
                 SelectFilter::make('name_completeness')
                     ->options([
                         'complete' => 'Complete Names (5+ characters)',
