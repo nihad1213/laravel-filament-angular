@@ -12,8 +12,11 @@ use App\Models\Platform;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Carbon\Carbon;
 
 class GameResource extends Resource
 {
@@ -80,6 +83,63 @@ class GameResource extends Resource
 
                Tables\Columns\TextColumn::make('platforms.name')
                    ->label('Platforms'),
+            ])
+
+            ->filters([
+                SelectFilter::make('categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->label('Filter by Category'),
+
+                SelectFilter::make('platforms')
+                    ->relationship('platforms', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->label('Filter by Platform'),
+
+                SelectFilter::make('release_year')
+                    ->options([
+                        '2024' => '2024',
+                        '2023' => '2023',
+                        '2022' => '2022',
+                        '2021' => '2021',
+                        '2020' => '2020',
+                        '2019' => '2019',
+                        '2018' => '2018',
+                        '2017' => '2017',
+                        '2016' => '2016',
+                        '2015' => '2015',
+                        'older' => 'Before 2015',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['value'],
+                            function (Builder $query, $year): Builder {
+                                if ($year === 'older') {
+                                    return $query->whereYear('release_date', '<', 2015);
+                                }
+                                return $query->whereYear('release_date', $year);
+                            }
+                        );
+                    })
+                    ->label('Release Year'),
+
+                Filter::make('recent_releases')
+                    ->query(fn (Builder $query): Builder => $query->where('release_date', '>=', Carbon::now()->subDays(30)))
+                    ->label('Recent Releases (Last 30 days)'),
+
+                Filter::make('upcoming_releases')
+                    ->query(fn (Builder $query): Builder => $query->where('release_date', '>', Carbon::now()))
+                    ->label('Upcoming Releases'),
+
+                Filter::make('has_cover_image')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('cover_image'))
+                    ->label('Has Cover Image'),
+
+                Filter::make('no_cover_image')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('cover_image'))
+                    ->label('Missing Cover Image'),
             ]);
     }
 
